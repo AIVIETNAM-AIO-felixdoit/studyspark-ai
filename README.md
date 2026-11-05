@@ -4,8 +4,8 @@ Turn any lecture notes into a complete study kit in about 10 seconds: summary, k
 
 Built for **Ostad Presents YUNet AIgnite Buildathon 2026**.
 
-- Live app: https://<username>.github.io/studyspark-ai/
-- Deck: https://<username>.github.io/studyspark-ai/deck.html
+- Live app: https://AIVIETNAM-AIO-felixdoit.github.io/studyspark-ai/
+- Deck: https://AIVIETNAM-AIO-felixdoit.github.io/studyspark-ai/deck.html
 
 ## Tech
 - Plain HTML/CSS/JavaScript (single page, no build step)
