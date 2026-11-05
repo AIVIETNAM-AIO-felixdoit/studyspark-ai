@@ -14,9 +14,11 @@ body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;b
 nav{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 20px;flex-wrap:wrap}
 .logo{font-weight:800;font-size:20px;display:flex;align-items:center;gap:8px}
 .logo span{background:linear-gradient(90deg,var(--brand),var(--brand2));-webkit-background-clip:text;background-clip:text;color:transparent}
-.sticker{display:flex;align-items:center;gap:8px}
-.sticker img{height:48px;width:auto;display:block}
-.sticker .fallback{display:none;font-size:12px;font-weight:700;padding:6px 10px;border-radius:8px;border:2px dashed var(--brand);color:var(--brand);max-width:260px;text-align:center}
+.navlinks{display:flex;gap:16px}
+.navlinks a{color:var(--muted);text-decoration:none;font-weight:600;font-size:14px}
+.navlinks a:hover{color:var(--brand)}
+.notice{background:var(--soft);border-radius:10px;padding:10px 14px;font-size:14px;margin-bottom:14px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
 main{max-width:1000px;margin:0 auto;padding:24px 16px 60px}
 .hero h1{font-size:clamp(26px,4vw,40px);margin:8px 0}
 .hero p{color:var(--muted);margin:0 0 20px;max-width:680px}
@@ -65,9 +67,9 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:20px}
 <body>
 <nav>
   <div class="logo">⚡ <span>StudySpark AI</span></div>
-  <div class="sticker" title="Built For Ostad Presents YUNet AIgnite Buildathon 2026">
-    <img src="sticker.png" alt="Built For Ostad Presents YUNet AIgnite Buildathon 2026" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
-    <div class="fallback">Built For Ostad Presents YUNet AIgnite Buildathon 2026</div>
+  <div class="navlinks">
+    <a href="deck.html" target="_blank" rel="noopener">Pitch deck</a>
+    <a href="https://github.com/AIVIETNAM-AIO-felixdoit/studyspark-ai" target="_blank" rel="noopener">GitHub</a>
   </div>
 </nav>
 
@@ -99,12 +101,14 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:20px}
         <option value="university">Level: University</option>
       </select>
       <button class="primary" id="go">✨ Generate study kit</button>
+      <span id="count" class="muted">0 characters</span>
     </div>
     <div id="status" class="muted" style="margin-top:8px"></div>
     <div id="error" class="err"></div>
   </section>
 
   <section class="card hidden" id="results">
+    <div id="notice" class="notice hidden"></div>
     <div class="tabs">
       <button class="tab active" data-tab="sum">📝 Summary</button>
       <button class="tab" data-tab="fc">🃏 Flashcards</button>
@@ -122,6 +126,11 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:20px}
       <div class="chatlog" id="chatlog"><div class="msg ai">Ask me anything about your notes. I will answer using your material.</div></div>
       <div class="chatrow"><input id="chatIn" placeholder="e.g. Explain this like I'm 12"><button class="primary" id="chatGo">Send</button></div>
     </div>
+    <div class="toolbar">
+      <button id="copySum">📋 Copy summary</button>
+      <button id="download">⬇️ Download study kit (.md)</button>
+      <button id="clear" class="ghost">🗑️ Clear</button>
+    </div>
   </section>
 </main>
 <footer>StudySpark AI · Built for Ostad Presents YUNet AIgnite Buildathon 2026 · AI by Puter.js</footer>
@@ -132,7 +141,62 @@ const SAMPLE = `Photosynthesis is the process by which green plants, algae and s
 Photosynthesis has two stages. The light-dependent reactions happen in the thylakoid membranes. Here, light is absorbed by chlorophyll, water is split (photolysis), oxygen is released, and ATP and NADPH are produced. The light-independent reactions, also called the Calvin cycle, happen in the stroma. They use ATP and NADPH to fix carbon dioxide into glucose with the help of the enzyme RuBisCO.
 Factors that affect the rate of photosynthesis include light intensity, carbon dioxide concentration and temperature. These are called limiting factors. Photosynthesis is important because it produces the oxygen we breathe and forms the base of almost every food chain on Earth.`;
 
+// Pre-built kit for the sample notes: used for the offline demo (?demo) and when the AI service is unreachable.
+const SAMPLE_KIT = {
+  title: "Photosynthesis",
+  summary: [
+    "Photosynthesis converts light energy into chemical energy (glucose) in plants, algae and some bacteria.",
+    "It happens mainly in chloroplasts, which contain the green pigment chlorophyll.",
+    "Overall equation: 6CO2 + 6H2O + light → C6H12O6 + 6O2.",
+    "Stage 1, the light-dependent reactions (thylakoid membranes): water is split, O2 is released, and ATP and NADPH are made.",
+    "Stage 2, the Calvin cycle (stroma): ATP and NADPH are used to fix CO2 into glucose with the enzyme RuBisCO.",
+    "Light intensity, CO2 concentration and temperature are limiting factors for the rate.",
+    "It supplies the oxygen we breathe and is the base of almost every food chain."
+  ],
+  keyTerms: [
+    {term:"Chlorophyll", meaning:"Green pigment in chloroplasts that absorbs light."},
+    {term:"Photolysis", meaning:"Splitting of water using light energy, which releases oxygen."},
+    {term:"Calvin cycle", meaning:"Light-independent reactions in the stroma that make glucose from CO2."},
+    {term:"RuBisCO", meaning:"Enzyme that fixes carbon dioxide in the Calvin cycle."},
+    {term:"Limiting factor", meaning:"The factor in shortest supply that limits the rate of a process."}
+  ],
+  examTips: [
+    "Learn the balanced equation by heart; it is asked almost every year.",
+    "Always match each stage to its location: light-dependent → thylakoid, Calvin cycle → stroma.",
+    "For graph questions, name the limiting factor on each part of the curve."
+  ],
+  flashcards: [
+    {q:"What is photosynthesis?", a:"The process that converts light energy into chemical energy stored in glucose."},
+    {q:"Where does photosynthesis mainly take place?", a:"In the chloroplasts of leaf cells."},
+    {q:"Write the overall equation of photosynthesis.", a:"6CO2 + 6H2O + light → C6H12O6 + 6O2"},
+    {q:"Where do the light-dependent reactions happen?", a:"In the thylakoid membranes."},
+    {q:"What is photolysis?", a:"The splitting of water by light, which releases oxygen."},
+    {q:"Which two products of the light reactions power the Calvin cycle?", a:"ATP and NADPH."},
+    {q:"Which enzyme fixes CO2 in the Calvin cycle?", a:"RuBisCO."},
+    {q:"Name three limiting factors of photosynthesis.", a:"Light intensity, CO2 concentration and temperature."}
+  ],
+  quiz: [
+    {question:"Which pigment absorbs light for photosynthesis?", options:["Haemoglobin","Chlorophyll","Melanin","Carotene only"], answer:1, explanation:"Chlorophyll in the chloroplasts absorbs light energy."},
+    {question:"Where does the Calvin cycle take place?", options:["Thylakoid membrane","Nucleus","Stroma","Mitochondria"], answer:2, explanation:"The light-independent reactions happen in the stroma."},
+    {question:"Which gas is released when water is split?", options:["Carbon dioxide","Nitrogen","Hydrogen","Oxygen"], answer:3, explanation:"Photolysis of water releases oxygen."},
+    {question:"What does RuBisCO do?", options:["Fixes carbon dioxide","Absorbs light","Splits water","Makes chlorophyll"], answer:0, explanation:"RuBisCO fixes CO2 in the Calvin cycle."},
+    {question:"Which of these is NOT a limiting factor?", options:["Light intensity","CO2 concentration","Soil colour","Temperature"], answer:2, explanation:"The notes list light, CO2 and temperature as limiting factors."}
+  ]
+};
+
 let kit = null, fcIdx = 0, chatHistory = [];
+const store = {
+  get(){ try { return JSON.parse(localStorage.getItem('studyspark') || 'null'); } catch { return null; } },
+  set(v){ try { localStorage.setItem('studyspark', JSON.stringify(v)); } catch {} },
+  clear(){ try { localStorage.removeItem('studyspark'); } catch {} }
+};
+function showKit(data, note){
+  kit = data; fcIdx = 0; chatHistory = [];
+  render(); $('#results').classList.remove('hidden');
+  $('#notice').classList.toggle('hidden', !note); $('#notice').textContent = note || '';
+}
+function updateCount(){ $('#count').textContent = `${$('#notes').value.length.toLocaleString()} characters`; }
+$('#notes').addEventListener('input', updateCount);
 
 function textOf(r){
   if (typeof r === 'string') return r;
@@ -150,8 +214,8 @@ function parseJSON(t){
 }
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
-$('#sample').onclick = () => { $('#notes').value = SAMPLE; };
-$('#file').onchange = async e => { const f = e.target.files[0]; if (f) $('#notes').value = await f.text(); };
+$('#sample').onclick = () => { $('#notes').value = SAMPLE; updateCount(); };
+$('#file').onchange = async e => { const f = e.target.files[0]; if (f) { $('#notes').value = await f.text(); updateCount(); } };
 
 $('#go').onclick = async () => {
   const notes = $('#notes').value.trim();
@@ -170,14 +234,19 @@ NOTES:
     let data;
     try { data = parseJSON(await ask(prompt)); }
     catch { data = parseJSON(await ask(prompt + '\nIMPORTANT: output strictly valid JSON only.')); }
-    kit = data; fcIdx = 0; chatHistory = [];
-    render(); $('#results').classList.remove('hidden');
+    showKit(data);
+    store.set({ notes, kit: data });
     $('#results').scrollIntoView({ behavior: 'smooth' });
     $('#status').textContent = '✅ Done! Explore your summary, flashcards and quiz below.';
   } catch (err) {
     console.error(err);
     $('#status').textContent = '';
-    $('#error').textContent = 'AI request failed. If a Puter sign-in popup appeared, please allow it (it is free) and try again.';
+    if (notes === SAMPLE) {
+      showKit(SAMPLE_KIT, 'The AI service could not be reached, so this is the pre-built demo kit for the sample notes.');
+      $('#results').scrollIntoView({ behavior: 'smooth' });
+    } else {
+      $('#error').textContent = 'AI request failed. If a Puter sign-in popup appeared, please allow it (it is free) and try again.';
+    }
   } finally { btn.disabled = false; btn.innerHTML = '✨ Generate study kit'; }
 };
 
@@ -206,7 +275,8 @@ function renderQuiz(){
   const box = $('#tab-quiz');
   box.innerHTML = qs.map((q,i)=>`<div class="q" data-i="${i}"><b>${i+1}. ${esc(q.question)}</b>
     ${q.options.map((o,j)=>`<button class="opt" data-j="${j}">${esc(o)}</button>`).join('')}
-    <div class="explain hidden"></div></div>`).join('') + `<div class="score" id="score">Score: 0 / ${qs.length}</div>`;
+    <div class="explain hidden"></div></div>`).join('') + `<div class="row"><div class="score" id="score">Score: 0 / ${qs.length}</div><button id="retake" class="ghost">↻ Retake quiz</button></div>`;
+  $('#retake').onclick = renderQuiz;
   box.querySelectorAll('.q').forEach(el => {
     const q = qs[+el.dataset.i];
     el.querySelectorAll('.opt').forEach(b => b.onclick = () => {
@@ -240,6 +310,33 @@ NOTES:\n"""${$('#notes').value.slice(0, 10000)}"""\n\nConversation:\n${chatHisto
 }
 $('#chatGo').onclick = sendChat;
 $('#chatIn').onkeydown = e => { if (e.key === 'Enter') sendChat(); };
+
+function kitMarkdown(k){
+  return `# ${k.title}\n\n## Key ideas\n${(k.summary||[]).map(s=>`- ${s}`).join('\n')}\n\n## Key terms\n${(k.keyTerms||[]).map(t=>`- **${t.term}**: ${t.meaning}`).join('\n')}\n\n## Exam tips\n${(k.examTips||[]).map(s=>`- ${s}`).join('\n')}\n\n## Flashcards\n${(k.flashcards||[]).map((c,i)=>`${i+1}. **Q:** ${c.q}\n   **A:** ${c.a}`).join('\n')}\n\n## Quiz\n${(k.quiz||[]).map((q,i)=>`${i+1}. ${q.question}\n${q.options.map((o,j)=>`   ${'ABCD'[j]}. ${o}`).join('\n')}\n   **Answer:** ${'ABCD'[q.answer]}. ${q.explanation||''}`).join('\n\n')}\n\n_Made with StudySpark AI_\n`;
+}
+$('#copySum').onclick = async () => {
+  const t = `${kit.title}\n` + (kit.summary||[]).map(s=>`• ${s}`).join('\n');
+  try { await navigator.clipboard.writeText(t); $('#copySum').textContent = '✅ Copied'; } catch { $('#copySum').textContent = 'Copy failed'; }
+  setTimeout(() => $('#copySum').textContent = '📋 Copy summary', 1500);
+};
+$('#download').onclick = () => {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([kitMarkdown(kit)], { type: 'text/markdown' }));
+  a.download = (kit.title || 'study-kit').replace(/[^\w\- ]+/g, '').trim().replace(/\s+/g, '-').toLowerCase() + '.md';
+  a.click(); URL.revokeObjectURL(a.href);
+};
+$('#clear').onclick = () => { store.clear(); kit = null; $('#results').classList.add('hidden'); $('#notes').value = ''; updateCount(); $('#status').textContent = ''; };
+
+// Restore last session, or load the offline demo with ?demo
+(() => {
+  if (new URLSearchParams(location.search).has('demo')) {
+    $('#notes').value = SAMPLE; updateCount();
+    showKit(SAMPLE_KIT, 'Demo mode: showing the pre-built study kit for the sample notes. Click "Generate study kit" to run the real AI.');
+    return;
+  }
+  const saved = store.get();
+  if (saved?.kit) { $('#notes').value = saved.notes || ''; updateCount(); showKit(saved.kit, 'Restored your last study kit.'); }
+})();
 </script>
 </body>
 </html>
