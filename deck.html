@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StudySpark AI Deck</title>
+<style>
+@page{size:1280px 720px;margin:0}
+*{box-sizing:border-box}
+body{margin:0;background:#222;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#1b1f2a}
+.slide{width:1280px;height:720px;margin:20px auto;background:#fff;position:relative;padding:70px 90px;overflow:hidden;page-break-after:always;break-after:page}
+.slide::before{content:"";position:absolute;left:0;top:0;width:14px;height:100%;background:linear-gradient(#5b4bff,#ff7a59)}
+.num{position:absolute;right:40px;bottom:30px;color:#9aa1b2;font-size:18px}
+.tag{color:#5b4bff;font-weight:800;letter-spacing:2px;text-transform:uppercase;font-size:18px}
+h1{font-size:64px;margin:10px 0 20px;line-height:1.1}
+h2{font-size:48px;margin:10px 0 30px}
+p,li{font-size:26px;line-height:1.5}
+ul{padding-left:30px}
+.grad{background:linear-gradient(90deg,#5b4bff,#ff7a59);-webkit-background-clip:text;background-clip:text;color:transparent}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:20px}
+.box{background:#efedff;border-radius:18px;padding:22px;font-size:22px}
+.box b{display:block;font-size:26px;margin-bottom:6px}
+.flow{display:flex;align-items:center;gap:14px;margin:30px 0}
+.step{flex:1;background:#efedff;border-radius:16px;padding:20px;font-size:21px;text-align:center}
+.step b{display:block;font-size:24px}
+.arrow{font-size:34px;color:#5b4bff}
+.stat{font-size:54px;font-weight:800;color:#5b4bff}
+@media print{body{background:#fff}.slide{margin:0}}
+@media (max-width:1300px){.slide{transform-origin:top left}}
+</style>
+</head>
+<body>
+
+<section class="slide">
+  <div class="tag">Problem Statement</div>
+  <h1>Students drown in notes,<br><span class="grad">but can't turn them into learning.</span></h1>
+  <ul>
+    <li>Millions of SSC, HSC and university students in Bangladesh study from long lecture notes, PDFs and guidebooks.</li>
+    <li>Making summaries, flashcards and practice questions by hand takes hours, so most students just re-read (the least effective way to study).</li>
+    <li>Private tutors and coaching centres are expensive and not available 24/7.</li>
+  </ul>
+  <div class="num">1 / 5</div>
+</section>
+
+<section class="slide">
+  <div class="tag">Proposed Solution</div>
+  <h1>⚡ <span class="grad">StudySpark AI</span></h1>
+  <p>A free web app that turns <b>any notes into a complete study kit in about 10 seconds</b>, in English or Bangla.</p>
+  <div class="grid">
+    <div class="box"><b>📝 Summary</b>Key ideas, key terms and exam tips</div>
+    <div class="box"><b>🃏 Flashcards</b>Tap-to-flip cards for active recall</div>
+    <div class="box"><b>✅ Quiz</b>MCQs with instant scoring and explanations</div>
+    <div class="box"><b>💬 Ask AI</b>A tutor that answers using your notes</div>
+  </div>
+  <p style="margin-top:30px">No sign-up, no install, works on any phone browser.</p>
+  <div class="num">2 / 5</div>
+</section>
+
+<section class="slide">
+  <div class="tag">How the Solution Works</div>
+  <h2>From notes to study kit</h2>
+  <div class="flow">
+    <div class="step"><b>1. Input</b>Paste notes or upload a .txt; pick language and level</div><div class="arrow">→</div>
+    <div class="step"><b>2. AI generation</b>LLM (GPT-4o-mini via Puter.js) with a structured prompt grounded only in the notes</div><div class="arrow">→</div>
+    <div class="step"><b>3. Structured JSON</b>Summary, terms, tips, 8 flashcards, 5 MCQs, validated and retried if invalid</div><div class="arrow">→</div>
+    <div class="step"><b>4. Interactive UI</b>Flip cards, take the quiz, chat with the AI tutor</div>
+  </div>
+  <ul>
+    <li><b>Tech:</b> HTML/CSS/JavaScript, Puter.js AI API (no server, no API key cost), hosted on GitHub Pages.</li>
+    <li><b>Adapts to the student:</b> high school / HSC / university level, English or Bangla output.</li>
+  </ul>
+  <div class="num">3 / 5</div>
+</section>
+
+<section class="slide">
+  <div class="tag">Impact &amp; Roadmap</div>
+  <h2>Why it matters</h2>
+  <div style="display:flex;gap:60px;margin-bottom:20px">
+    <div><div class="stat">Hours → 10s</div><p>to build a study kit</p></div>
+    <div><div class="stat">৳0</div><p>cost for students</p></div>
+    <div><div class="stat">2 languages</div><p>English &amp; Bangla</p></div>
+  </div>
+  <p><b>Next steps:</b></p>
+  <ul>
+    <li>PDF and photo upload (OCR for handwritten notes)</li>
+    <li>Spaced-repetition reminders and progress tracking</li>
+    <li>NCTB syllabus-aligned question banks; freemium model for coaching centres</li>
+  </ul>
+  <div class="num">4 / 5</div>
+</section>
+
+<section class="slide">
+  <div class="tag">About Me</div>
+  <h2>[Your Name]</h2>
+  <ul>
+    <li>[Class / Year], [School / College / University], Bangladesh</li>
+    <li>Interested in AI, education technology and building useful products</li>
+    <li>Built StudySpark AI solo for Ostad Presents YUNet AIgnite Buildathon 2026</li>
+  </ul>
+  <p style="margin-top:40px"><b>Live app:</b> [LIVE_URL]<br><b>Contact:</b> [your email]</p>
+  <div class="num">5 / 5</div>
+</section>
+
+</body>
+</html>

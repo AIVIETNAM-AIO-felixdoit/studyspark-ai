@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StudySpark AI</title>
+<meta name="description" content="Turn any lecture notes into a summary, flashcards and a quiz in seconds with AI.">
+<script src="https://js.puter.com/v2/"></script>
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--ink:#1b1f2a;--muted:#5f6779;--line:#e3e6ee;--brand:#5b4bff;--brand2:#ff7a59;--ok:#12a150;--bad:#d93a3a;--soft:#efedff}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1117;--card:#181b24;--ink:#eef0f6;--muted:#9aa1b2;--line:#2a2f3c;--soft:#25224a}}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+nav{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 20px;flex-wrap:wrap}
+.logo{font-weight:800;font-size:20px;display:flex;align-items:center;gap:8px}
+.logo span{background:linear-gradient(90deg,var(--brand),var(--brand2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sticker{display:flex;align-items:center;gap:8px}
+.sticker img{height:48px;width:auto;display:block}
+.sticker .fallback{display:none;font-size:12px;font-weight:700;padding:6px 10px;border-radius:8px;border:2px dashed var(--brand);color:var(--brand);max-width:260px;text-align:center}
+main{max-width:1000px;margin:0 auto;padding:24px 16px 60px}
+.hero h1{font-size:clamp(26px,4vw,40px);margin:8px 0}
+.hero p{color:var(--muted);margin:0 0 20px;max-width:680px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:20px}
+textarea{width:100%;min-height:180px;resize:vertical;padding:14px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
+select,button,label.file{font:inherit;border-radius:10px;padding:10px 14px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+button.primary{background:var(--brand);color:#fff;border-color:var(--brand);font-weight:700}
+button.primary:disabled{opacity:.6;cursor:wait}
+button.ghost{background:transparent}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.tab{border-radius:999px;padding:8px 16px}
+.tab.active{background:var(--soft);border-color:var(--brand);color:var(--brand);font-weight:700}
+.hidden{display:none!important}
+.muted{color:var(--muted);font-size:14px}
+.summary h3{margin:.8em 0 .3em}
+.summary ul{margin:.2em 0;padding-left:1.2em}
+.fc-wrap{display:flex;flex-direction:column;align-items:center;gap:12px}
+.flash{width:100%;max-width:560px;height:240px;perspective:1000px;cursor:pointer}
+.flash-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.flash.flipped .flash-inner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:16px;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;font-size:20px;border:1px solid var(--line)}
+.front{background:var(--soft);font-weight:700}
+.back{background:var(--card);transform:rotateY(180deg);font-size:17px}
+.q{border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0}
+.opt.correct{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 15%,transparent)}
+.opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 15%,transparent)}
+.explain{font-size:14px;color:var(--muted);margin-top:6px}
+.score{font-size:22px;font-weight:800}
+.chatlog{max-height:360px;overflow:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.msg{padding:10px 14px;border-radius:12px;max-width:85%;white-space:pre-wrap}
+.msg.me{align-self:flex-end;background:var(--brand);color:#fff}
+.msg.ai{align-self:flex-start;background:var(--soft)}
+.chatrow{display:flex;gap:8px}
+.chatrow input{flex:1;padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid #fff;border-right-color:transparent;border-radius:50%;animation:s .7s linear infinite;vertical-align:-3px;margin-right:6px}
+@keyframes s{to{transform:rotate(360deg)}}
+.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px}
+.feat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.feat b{display:block}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:20px}
+.err{color:var(--bad);margin-top:10px}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">⚡ <span>StudySpark AI</span></div>
+  <div class="sticker" title="Built For Ostad Presents YUNet AIgnite Buildathon 2026">
+    <img src="sticker.png" alt="Built For Ostad Presents YUNet AIgnite Buildathon 2026" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+    <div class="fallback">Built For Ostad Presents YUNet AIgnite Buildathon 2026</div>
+  </div>
+</nav>
+
+<main>
+  <section class="hero">
+    <h1>Turn any notes into a study kit in 10 seconds.</h1>
+    <p>Paste lecture notes, a textbook page or a transcript. StudySpark AI writes a clear summary, makes flashcards, quizzes you, and answers your questions, in English or Bangla. Free, no sign-up.</p>
+  </section>
+
+  <div class="features">
+    <div class="feat"><b>📝 Smart summary</b><span class="muted">Key ideas, terms and exam tips</span></div>
+    <div class="feat"><b>🃏 Flashcards</b><span class="muted">Tap to flip, active recall</span></div>
+    <div class="feat"><b>✅ Auto quiz</b><span class="muted">MCQs with instant feedback</span></div>
+    <div class="feat"><b>💬 Ask your notes</b><span class="muted">AI tutor grounded in your text</span></div>
+  </div>
+
+  <section class="card">
+    <textarea id="notes" placeholder="Paste your notes here (at least a few sentences)…"></textarea>
+    <div class="row">
+      <label class="file">📄 Upload .txt<input type="file" id="file" accept=".txt,.md" hidden></label>
+      <button class="ghost" id="sample">Try sample notes</button>
+      <select id="lang" aria-label="Output language">
+        <option value="English">Output: English</option>
+        <option value="Bangla (Bengali script)">Output: বাংলা</option>
+      </select>
+      <select id="level" aria-label="Level">
+        <option value="high school">Level: High school</option>
+        <option value="college / HSC">Level: College (HSC)</option>
+        <option value="university">Level: University</option>
+      </select>
+      <button class="primary" id="go">✨ Generate study kit</button>
+    </div>
+    <div id="status" class="muted" style="margin-top:8px"></div>
+    <div id="error" class="err"></div>
+  </section>
+
+  <section class="card hidden" id="results">
+    <div class="tabs">
+      <button class="tab active" data-tab="sum">📝 Summary</button>
+      <button class="tab" data-tab="fc">🃏 Flashcards</button>
+      <button class="tab" data-tab="quiz">✅ Quiz</button>
+      <button class="tab" data-tab="chat">💬 Ask AI</button>
+    </div>
+    <div id="tab-sum" class="summary"></div>
+    <div id="tab-fc" class="hidden fc-wrap">
+      <div class="flash" id="flash"><div class="flash-inner"><div class="face front" id="fcFront"></div><div class="face back" id="fcBack"></div></div></div>
+      <div class="row"><button id="prev">← Prev</button><span id="fcCount" class="muted"></span><button id="next">Next →</button><button id="shuffle" class="ghost">🔀 Shuffle</button></div>
+      <div class="muted">Tap the card to flip</div>
+    </div>
+    <div id="tab-quiz" class="hidden"></div>
+    <div id="tab-chat" class="hidden">
+      <div class="chatlog" id="chatlog"><div class="msg ai">Ask me anything about your notes. I will answer using your material.</div></div>
+      <div class="chatrow"><input id="chatIn" placeholder="e.g. Explain this like I'm 12"><button class="primary" id="chatGo">Send</button></div>
+    </div>
+  </section>
+</main>
+<footer>StudySpark AI · Built for Ostad Presents YUNet AIgnite Buildathon 2026 · AI by Puter.js</footer>
+
+<script>
+const $ = s => document.querySelector(s);
+const SAMPLE = `Photosynthesis is the process by which green plants, algae and some bacteria convert light energy into chemical energy. It takes place mainly in the chloroplasts of leaf cells, which contain the green pigment chlorophyll. The overall equation is: 6CO2 + 6H2O + light energy -> C6H12O6 + 6O2.
+Photosynthesis has two stages. The light-dependent reactions happen in the thylakoid membranes. Here, light is absorbed by chlorophyll, water is split (photolysis), oxygen is released, and ATP and NADPH are produced. The light-independent reactions, also called the Calvin cycle, happen in the stroma. They use ATP and NADPH to fix carbon dioxide into glucose with the help of the enzyme RuBisCO.
+Factors that affect the rate of photosynthesis include light intensity, carbon dioxide concentration and temperature. These are called limiting factors. Photosynthesis is important because it produces the oxygen we breathe and forms the base of almost every food chain on Earth.`;
+
+let kit = null, fcIdx = 0, chatHistory = [];
+
+function textOf(r){
+  if (typeof r === 'string') return r;
+  const c = r?.message?.content;
+  if (Array.isArray(c)) return c.map(x => x.text || '').join('');
+  return c ?? r?.text ?? String(r);
+}
+async function ask(prompt){
+  const r = await puter.ai.chat(prompt, { model: 'gpt-4o-mini' });
+  return textOf(r);
+}
+function parseJSON(t){
+  const m = t.match(/\{[\s\S]*\}/);
+  return JSON.parse(m ? m[0] : t);
+}
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+$('#sample').onclick = () => { $('#notes').value = SAMPLE; };
+$('#file').onchange = async e => { const f = e.target.files[0]; if (f) $('#notes').value = await f.text(); };
+
+$('#go').onclick = async () => {
+  const notes = $('#notes').value.trim();
+  $('#error').textContent = '';
+  if (notes.length < 80) { $('#error').textContent = 'Please paste a bit more text (at least a few sentences), or click "Try sample notes".'; return; }
+  const lang = $('#lang').value, level = $('#level').value;
+  const btn = $('#go'); btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Generating…';
+  $('#status').textContent = 'AI is reading your notes and building your study kit…';
+  const prompt = `You are an expert tutor for a ${level} student in Bangladesh. Using ONLY the notes below, create a study kit. Write all text values in ${lang}.
+Return ONLY valid JSON, no markdown fences, in exactly this shape:
+{"title":"short topic title","summary":["5-7 bullet points with the key ideas"],"keyTerms":[{"term":"","meaning":""}],"examTips":["2-3 tips"],"flashcards":[{"q":"question","a":"short answer"}],"quiz":[{"question":"","options":["A","B","C","D"],"answer":0,"explanation":"why"}]}
+Make 8 flashcards and 5 quiz questions. "answer" is the index (0-3) of the correct option.
+NOTES:
+"""${notes.slice(0, 12000)}"""`;
+  try {
+    let data;
+    try { data = parseJSON(await ask(prompt)); }
+    catch { data = parseJSON(await ask(prompt + '\nIMPORTANT: output strictly valid JSON only.')); }
+    kit = data; fcIdx = 0; chatHistory = [];
+    render(); $('#results').classList.remove('hidden');
+    $('#results').scrollIntoView({ behavior: 'smooth' });
+    $('#status').textContent = '✅ Done! Explore your summary, flashcards and quiz below.';
+  } catch (err) {
+    console.error(err);
+    $('#status').textContent = '';
+    $('#error').textContent = 'AI request failed. If a Puter sign-in popup appeared, please allow it (it is free) and try again.';
+  } finally { btn.disabled = false; btn.innerHTML = '✨ Generate study kit'; }
+};
+
+function render(){
+  const k = kit;
+  $('#tab-sum').innerHTML = `<h2>${esc(k.title)}</h2>
+    <h3>Key ideas</h3><ul>${(k.summary||[]).map(s=>`<li>${esc(s)}</li>`).join('')}</ul>
+    <h3>Key terms</h3><ul>${(k.keyTerms||[]).map(t=>`<li><b>${esc(t.term)}</b>: ${esc(t.meaning)}</li>`).join('')}</ul>
+    <h3>Exam tips</h3><ul>${(k.examTips||[]).map(s=>`<li>${esc(s)}</li>`).join('')}</ul>`;
+  showCard();
+  renderQuiz();
+}
+function showCard(){
+  const c = kit.flashcards || []; if (!c.length) return;
+  $('#flash').classList.remove('flipped');
+  $('#fcFront').textContent = c[fcIdx].q; $('#fcBack').textContent = c[fcIdx].a;
+  $('#fcCount').textContent = `${fcIdx+1} / ${c.length}`;
+}
+$('#flash').onclick = () => $('#flash').classList.toggle('flipped');
+$('#next').onclick = () => { fcIdx = (fcIdx + 1) % kit.flashcards.length; showCard(); };
+$('#prev').onclick = () => { fcIdx = (fcIdx - 1 + kit.flashcards.length) % kit.flashcards.length; showCard(); };
+$('#shuffle').onclick = () => { kit.flashcards.sort(() => Math.random() - .5); fcIdx = 0; showCard(); };
+
+function renderQuiz(){
+  let answered = 0, correct = 0; const qs = kit.quiz || [];
+  const box = $('#tab-quiz');
+  box.innerHTML = qs.map((q,i)=>`<div class="q" data-i="${i}"><b>${i+1}. ${esc(q.question)}</b>
+    ${q.options.map((o,j)=>`<button class="opt" data-j="${j}">${esc(o)}</button>`).join('')}
+    <div class="explain hidden"></div></div>`).join('') + `<div class="score" id="score">Score: 0 / ${qs.length}</div>`;
+  box.querySelectorAll('.q').forEach(el => {
+    const q = qs[+el.dataset.i];
+    el.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+      if (el.dataset.done) return; el.dataset.done = 1; answered++;
+      const j = +b.dataset.j, ans = +q.answer;
+      el.querySelectorAll('.opt')[ans].classList.add('correct');
+      if (j === ans) correct++; else b.classList.add('wrong');
+      const ex = el.querySelector('.explain'); ex.textContent = (j===ans?'✅ Correct. ':'❌ Not quite. ') + (q.explanation||''); ex.classList.remove('hidden');
+      $('#score').textContent = `Score: ${correct} / ${qs.length}` + (answered===qs.length ? (correct/qs.length>=.8?' 🎉 Great job!':' · Review the flashcards and try again!') : '');
+    });
+  });
+}
+
+document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
+  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active')); t.classList.add('active');
+  ['sum','fc','quiz','chat'].forEach(n => $('#tab-'+n).classList.toggle('hidden', n !== t.dataset.tab));
+});
+
+async function sendChat(){
+  const q = $('#chatIn').value.trim(); if (!q) return; $('#chatIn').value = '';
+  const log = $('#chatlog');
+  log.insertAdjacentHTML('beforeend', `<div class="msg me">${esc(q)}</div>`);
+  const thinking = document.createElement('div'); thinking.className = 'msg ai'; thinking.textContent = '…'; log.appendChild(thinking); log.scrollTop = log.scrollHeight;
+  chatHistory.push(`Student: ${q}`);
+  try {
+    const a = await ask(`You are a friendly tutor for a ${$('#level').value} student. Answer in ${$('#lang').value}, concisely, based on these notes (say so if the notes don't cover it).
+NOTES:\n"""${$('#notes').value.slice(0, 10000)}"""\n\nConversation:\n${chatHistory.slice(-8).join('\n')}\nTutor:`);
+    thinking.textContent = a.trim(); chatHistory.push(`Tutor: ${a.trim()}`);
+  } catch { thinking.textContent = 'Sorry, the AI request failed. Please try again.'; }
+  log.scrollTop = log.scrollHeight;
+}
+$('#chatGo').onclick = sendChat;
+$('#chatIn').onkeydown = e => { if (e.key === 'Enter') sendChat(); };
+</script>
+</body>
+</html>
